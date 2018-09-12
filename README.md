@@ -572,7 +572,7 @@ circles.merge(circles_enter)
   .attr('cx', (d,i) => d*10)
   .attr('cy', (d,i) => i*50);
 
-circles.exit().remove();
+circles.exit().remove(); 
 ```
 [Open in CodePen](https://codepen.io/thinkh/pen/mWgpNW)
 
@@ -594,6 +594,29 @@ circles.exit().remove();
 ```
 
 This is a common pitfall when using D3 resulting from premature optimization. In this case it `circles` stores the *enter*-phase instead of the generic data-join selection. This happens quite often you just create a visualizations but don't think about updating your visualization. The first error is that the `exit` function is not defined. The severe problem is that the next time you run the same function even with modified dataset, the attributes `cx` and `cy` won't be updated. The reason is that the *enter*-phase selector is empty, since there is no need for new DOM elements.
+
+You also can not `exit()` on a merged selection, e.g.:
+```js
+const data = [1,2,3];
+// select svg element
+// select all circles - even if there none yet - and bind the data array `data` onto them
+let circles = d3.select('svg').selectAll('circle').data(data);
+
+// enter phase
+// append an element matching the selector and set constant attributes
+let circles_enter = circles.enter().append('circle');
+circles_enter.attr('r', 10);
+
+// update phase ... actually update all including the newly created ones
+let circles_update = circles;
+let circles_update_and_enter = circles_update.merge(circles_enter);
+circles_update_and_enter.attr('cx', (d,i) => d*10);
+circles_update_and_enter.attr('cy', (d,i) => i*50);
+
+// exit phase
+circles_update_and_enter.exit().remove(); // <--- does not work
+``` 
+see https://github.com/d3/d3-selection/issues/115.
 
 ---
 
