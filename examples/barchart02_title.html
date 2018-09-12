@@ -62,14 +62,17 @@
     // new elements
     const rect_enter = rect.enter().append('rect')
       .attr('x', 0);
+      
+    rect_enter.append('title');
+
 
     // ENTER + UPDATE
     // both old and new elements
     rect.merge(rect_enter)
       .attr('height', bar_height)
       .attr('width', (d) => d * 7)
-      .attr('y', (d, i) => i * (bar_height + 5));
-
+      .attr('y', (d, i) => i * (bar_height + 5))
+      .select('title').text((d) => d)
 
     // EXIT
     // elements that aren't associated with data

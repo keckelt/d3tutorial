@@ -50,23 +50,42 @@
     const bar_height = 50;
 
   /////////////////////////
-  // TODO bind our data items to rects in our group `g`
+  //bind our data items to rects in our group `g`
   // such that
   // height = bar_height
   // width = d*7
   // y = i*(bar_height+5)
 
-  // Render the chart with new data
+  // create functions to generate the axis:
+  const xscale = d3.scaleLinear().domain([0, d3.max(data.map(d => d.temperature))]).range([0, width]); 
+  const yscale = d3.scaleLinear().domain(data.map(d => d.location.city)).range([height, 0]);
 
+  const xaxis = d3.axisTop().scale(xscale); // axis with labels below line
+  const yaxis = d3.axisLeft().scale(yscale); // axis with labels left of line
+
+  g.append('g').classed('x.axis', true).call(xaxis); 
+  g.append('g').classed('y.axis', true).call(yaxis);
+
+
+  const bar_group = g.append('g');
+  // Render the chart with new data
   // DATA JOIN
+  bars = bar_group.selectAll('rect').data(data);
 
   // ENTER
   // new elements
-
+  const bars_enter = bars.enter().append('rect');
+  bars_update = bars.merge(bars_enter)
   // ENTER + UPDATE
   // both old and new elements
-
+  bars_update.attr('x', 0)
+    .attr('y', (d,i) => i*(bar_height+5))
+    .attr('width', (d,i) => d*7)
+    .attr('height', bar_height)
+    
   // EXIT
+  bars.exit().remove();
+
   </script>
 </body>
 

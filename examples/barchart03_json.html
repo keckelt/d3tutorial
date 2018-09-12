@@ -55,29 +55,33 @@
     // use `.temperature` as `width` and
     // the `location.city` as `title`
 
-    // Render the chart with new data
+    (async () => {
+      const response = await fetch('weather.json');
+      const data = await response.json();
 
-    // DATA JOIN
-    const rect = g.selectAll('rect').data(data);
+      console.log('data', data);
+      // DATA JOIN
+      const rect = g.selectAll('rect').data(data);
 
-    // ENTER
-    // new elements
-    const rect_enter = rect.enter().append('rect')
-      .attr('x', 0);
-    rect_enter.append('title');
+      // ENTER
+      // new elements
+      const rect_enter = rect.enter().append('rect')
+        .attr('x', 0);
+      rect_enter.append('title');
 
-    // ENTER + UPDATE
-    // both old and new elements
-    rect.merge(rect_enter)
-      .attr('height', bar_height)
-      .attr('width', (d) => d * 7)
-      .attr('y', (d, i) => i * (bar_height + 5));
+      // ENTER + UPDATE
+      // both old and new elements
+      rect.merge(rect_enter)
+        .attr('height', bar_height)
+        .attr('width', (d) => d.temperature)
+        .attr('y', (d, i) => i * (bar_height + 5));
 
-    rect.merge(rect_enter).select('title').text((d) => `value: ${d}`);
+      rect.merge(rect_enter).select('title').text((d) => d.location.city);
 
-    // EXIT
-    // elements that aren't associated with data
-    rect.exit().remove();
+      // EXIT
+      // elements that aren't associated with data
+      rect.exit().remove();
+    })();
 
   </script>
 </body>

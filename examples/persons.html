@@ -15,28 +15,31 @@
   <script>
 
     const margin = { top: 20, bottom: 40, left: 30, right: 20 };
-    const width = 800 - margin.left - margin.right;
-    const height = 600 - margin.top - margin.bottom;
+    const width = 300 - margin.left - margin.right;
+    const height = 300 - margin.top - margin.bottom;
 
     // Creates sources <svg> element
     const svg = d3.select('body').append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom);
 
+
     // Group used to enforce margin
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-    const data = [{
+    svg.style('background-color', 'lightgrey')
+
+    const all_data = [{
       name: 'Steve',
       age: 10,
       weight: 30,
       gender: 'male'
     }, {
-      name: 'Stan',
+      name: 'Abigail',
       age: 15,
       weight: 60,
-      gender: 'male'
+      gender: 'female'
     }, {
       name: 'Tom',
       age: 18,
@@ -49,27 +52,46 @@
       gender: 'female'
     }]
 
+
+   
     const color = d3.scaleOrdinal().domain(['female', 'male']).range(['red', 'blue']);
-    const xscale = d3.scaleLinear().domain([0, d3.max(data, (d) => d.age)]).range([0, width]);
-    const yscale = d3.scaleLinear().domain([0, d3.max(data, (d) => d.weight)]).range([height, 0]);
+    // create functions to generate the axis:
+    const xscale = d3.scaleLinear().domain([0, d3.max(all_data, (d) => d.age)*1.1]).range([0, width]); 
+    const yscale = d3.scaleLinear().domain([0, d3.max(all_data, (d) => d.weight)*1.1]).range([height, 0]);
 
-    const xaxis = d3.axisBottom().scale(xscale);
-    const yaxis = d3.axisLeft().scale(yscale);
+    const xaxis = d3.axisBottom().scale(xscale); // axis with labels below line
+    const yaxis = d3.axisLeft().scale(yscale); // axis with labels left of line
 
-    g.append('g').classed('x.axis', true).attr('transform', `translate(0,${height})`).call(xaxis);
+    // call the axis generator and put the svg elements into a new group
+    g.append('g').classed('x.axis', true).attr('transform', `translate(0,${height})`).call(xaxis); 
     g.append('g').classed('y.axis', true).call(yaxis);
-    const group = g.append('g');
+    
+    const group = g.append('g'); //group for the circles
 
-    const marks = group.selectAll('circle').data(data);
-    const marks_enter = marks.enter().append('circle');
-    marks_enter.attr('r', 5).append('title');
-    const marks_update = marks.merge(marks_enter)
-      .style('fill', (d) => color(d.gender))
-      .attr('cx', (d) => xscale(d.age))
-      .attr('cy', (d) => yscale(d.weight));
+    function processData(data) {
+      console.log('process data', data)
 
-    marks_update.select('title').text((d) => d.name);
-    marks.exit().remove();
+      const marks = group.selectAll('circle').data(data); // select all circle elements in the group (there are none, but still...)
+      // the enter function creates circle elements if there are more elements in "data" then there are circles in the "group"
+      const marks_enter = marks.enter().append('circle');
+      marks_enter.attr('r', 50).append('title');
+      const marks_update = marks.merge(marks_enter)
+        .style('fill', (d) => color(d.gender))
+        .attr('cx', (d) => xscale(d.age))
+        .attr('cy', (d) => yscale(d.weight));
+
+      marks_update.select('title').text((d) => d.name);
+      marks.exit().remove()
+    }
+
+    for (let i = 0; i <= all_data.length; i++) {
+      setTimeout(processData, i*1000, all_data.slice(0,i));
+    }
+
+    setTimeout(processData, (all_data.length+2)*1000, all_data.slice(0,2))
+    setTimeout(processData, (all_data.length+3)*1000, all_data)
+    setTimeout(processData, (all_data.length+4)*1000, all_data.slice(2,4))
+    setTimeout(processData, (all_data.length+5)*1000, all_data.slice(1,3))
 
   </script>
 </body>

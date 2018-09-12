@@ -99,6 +99,7 @@
       // ENTER + UPDATE
       // both old and new elements
       rect.merge(rect_enter)
+        .transition().duration(1000).delay(300)
         .attr('height', yscale.bandwidth())
         .attr('width', (d) => xscale(d.temperature))
         .attr('y', (d) => yscale(d.location.city));
